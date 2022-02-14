@@ -43,8 +43,23 @@ const userController = {
     }, 
 
     refreshToken: (req, res) => {
+       try {
+       
        const rf_token = req.cookies.refreshtoken; //requesting for refresh token. 
+       if(!rf_token) return res.status(400).json({msg: 'Please Login or Register'}); //
+       
+       jwt.verify(rf_token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+          if(err) return res.status(400).json({msg: "Please Login or Register"}); 
+
+          const accessToken = createAccessToken({id: user.id})
+          res.json({accessToken})
+       })
+   
        res.json({rf_token});
+          
+      }catch (err) {
+         res.status(400).json({msg: err.message})
+      }
     }
 }
 
